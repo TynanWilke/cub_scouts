@@ -14,22 +14,24 @@ POE_URL = "https://api.poe.com/v1/chat/completions"
 OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "img")
 
 STYLE = (
-    "Black and white coloring page line art for young children (ages 6-8). "
-    "Full body of a {animal}, facing the viewer, centered, plain solid white background. "
-    "Thick clean uniform black outlines only, closed shapes, bold cartoon style, "
-    "friendly round eyes and a gentle smile. "
-    "NO shading, NO gray fills, NO hatching, NO texture, NO color anywhere. "
-    "The body must be mostly large EMPTY blank areas so kids can draw their own "
-    "patterns on it - do not draw stripes, spots, scales or any pattern on the body. "
-    "Very simple shapes, not realistic, not detailed. "
+    "Black and white coloring page line art of a REAL animal as it looks in nature. "
+    "Naturalistic, true-to-life anatomy, proportions and body shape - accurate to the "
+    "real species, like a good natural-history field-guide ink drawing. "
+    "NOT a cartoon, NOT cute or chibi, no big eyes, no smiling face, no human-like expression. "
+    "Full body of a {animal}, centered, plain solid white background. "
+    "Clean uniform black outlines of the animal's true silhouette and major body parts "
+    "(head, limbs, tail, wings) - and NOTHING else on the body: no shading, no gray fills, "
+    "no hatching, no fur or scale texture, no color anywhere. "
+    "The body must be large EMPTY blank areas so kids can draw their own patterns on it - "
+    "do not draw stripes, spots, scales or any pattern. "
     "No text, no words, no border, no frame, no background scenery, no ground."
 )
 
 ANIMALS = {
-    "frog": "cute happy frog sitting with legs tucked",
-    "zebra": "cute zebra standing in side view with its head turned toward the viewer",
-    "butterfly": "cute butterfly with wings spread wide open, seen from above",
-    "snake": "cute friendly snake curled in a loose S shape with its head raised",
+    "frog": "a frog sitting upright on its haunches with front legs braced, seen from the front",
+    "zebra": "a plains zebra standing in full side view",
+    "butterfly": "a monarch butterfly with wings spread flat, seen from above",
+    "snake": "a snake coiled in loose S-curves with its head raised, seen from the side",
 }
 
 
@@ -97,12 +99,14 @@ def poe_image(prompt: str, key: str, timeout: int = 240) -> bytes:
 
 
 def main() -> None:
-    only = sys.argv[1:] or list(ANIMALS)
+    args = [a for a in sys.argv[1:] if a != "--force"]
+    force = "--force" in sys.argv
+    only = args or list(ANIMALS)
     key = load_key()
     os.makedirs(OUT_DIR, exist_ok=True)
     for name in only:
         out = os.path.join(OUT_DIR, f"{name}.png")
-        if os.path.exists(out) and "--force" not in sys.argv:
+        if os.path.exists(out) and not force:
             print(f"{name}: exists, skip")
             continue
         prompt = STYLE.format(animal=ANIMALS[name])
